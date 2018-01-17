@@ -16,6 +16,7 @@ console.log({primaryColor, accentColor})
 const theme = createMuiTheme({
     palette         : {
         primary         : {main: primaryColor['700']},
+        secondary       : {main: accentColor['A400']},
         type            : 'dark',
     },
 }/*{

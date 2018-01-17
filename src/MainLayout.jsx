@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 
 import { withStyles } from 'material-ui/styles'
@@ -12,7 +12,10 @@ import Tooltip from 'material-ui/Tooltip'
 import AddIcon from 'material-ui-icons/Add'
 import BeenHereIcon from 'material-ui-icons/Beenhere'
 
+import Zoom from 'material-ui/transitions/Zoom'
+
 import SpotCard from './SpotCard.jsx'
+import NewSpotDialog from './NewSpotDialog.jsx'
 
 const styles = theme => ({
     root: {
@@ -31,42 +34,69 @@ const styles = theme => ({
     icon                : {
         verticalAlign       : 'middle',
     },
+    appName             : {
+        fontFamily          : '"Fugaz One", cursive',
+    },
 })
 
-function SimpleAppBar(props) {
-    const { classes } = props;
+class MainLayout extends Component {
 
-    return (
-        <div className={classes.root}>
-            <AppBar position="static" color="primary">
-                <Toolbar className={classes.fixedWidth}>
-                    <Typography type="title" color="inherit">
-                        kvaakr.io
-                    </Typography>
-                </Toolbar>
-            </AppBar>
+    state = {
+        newSpotDialog               : false,
+    }
 
-            <br />
+    render () {
+        const {classes} = this.props;
 
-            <div className={classes.fixedWidth}>
-                <Typography gutterBottom type="title">
-                    <BeenHereIcon className={classes.icon} /> Viimeisimmät havainnot
-                </Typography>
-
-                {[0,1,2,3,4].map(() => <SpotCard />)}
-            </div>
-
+        const fab = (
             <Tooltip title="Lisää havainto">
-                <Button fab className={classes.fab}>
-                    <AddIcon />
-                </Button>
+                <Zoom in={!this.state.newSpotDialog}>
+                    <Button fab className={classes.fab} onClick={this.toggleNewSpotDialog(true)}>
+                        <AddIcon />
+                    </Button>
+                </Zoom>
             </Tooltip>
-        </div>
-    )
+        )
+
+        return (
+            <div className={classes.root}>
+                <AppBar position="static" color="primary">
+                    <Toolbar className={classes.fixedWidth}>
+                        <Typography type="title" color="inherit" className={classes.appName}>
+                            kvaakr.io
+                        </Typography>
+                    </Toolbar>
+                </AppBar>
+
+                <br />
+
+                <div className={classes.fixedWidth}>
+                    <Typography gutterBottom type="title">
+                        <BeenHereIcon className={classes.icon} /> Viimeisimmät havainnot
+                    </Typography>
+
+                    {[0,1,2,3,4].map(key => <SpotCard key={key} />)}
+                </div>
+
+                <NewSpotDialog
+                    open={this.state.newSpotDialog}
+                    onClose={this.toggleNewSpotDialog(false)}
+                />
+
+                {fab}
+            </div>
+        )
+    }
+
+    toggleNewSpotDialog = bool => () => {
+        this.setState({
+            newSpotDialog                   : bool,
+        })
+    }
 }
 
-SimpleAppBar.propTypes = {
+MainLayout.propTypes = {
     classes: PropTypes.object.isRequired,
 }
 
-export default withStyles(styles)(SimpleAppBar)
+export default withStyles(styles)(MainLayout)
