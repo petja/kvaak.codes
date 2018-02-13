@@ -1,25 +1,33 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 
+import * as CONFIG from './Config.js'
+import * as Router from './Router.js'
+
 import { withStyles } from 'material-ui/styles'
 import AppBar from 'material-ui/AppBar'
 import Toolbar from 'material-ui/Toolbar'
 import Typography from 'material-ui/Typography'
 import Button from 'material-ui/Button'
 import Tooltip from 'material-ui/Tooltip'
+import Zoom from 'material-ui/transitions/Zoom'
 
 // Icons
 import AddIcon from 'material-ui-icons/Add'
 import BeenHereIcon from 'material-ui-icons/Beenhere'
 
-import Zoom from 'material-ui/transitions/Zoom'
-
-import SpotCard from './SpotCard.jsx'
+import SpotList from './SpotList.jsx'
 import NewSpotDialog from './NewSpotDialog.jsx'
+import WelcomeDialog from './WelcomeDialog.jsx'
 
 const styles = theme => ({
-    root: {
-        width: '100%',
+    root                : {
+        background          : theme.palette.background.default,
+        width               : '100%',
+        minHeight           : '100%',
+        paddingTop          : '5em',
+        paddingBottom       : '2em',
+        boxSizing           : 'border-box',
     },
     fab                 : {
         position            : 'fixed',
@@ -42,50 +50,88 @@ const styles = theme => ({
 class MainLayout extends Component {
 
     state = {
-        newSpotDialog               : false,
+        route                       : {
+            newSpotDialog               : false,
+        },
     }
 
     render () {
         const {classes} = this.props;
 
         const fab = (
-            <Tooltip title="Lisää havainto">
-                <Zoom in={!this.state.newSpotDialog}>
-                    <Button fab className={classes.fab} onClick={this.toggleNewSpotDialog(true)}>
-                        <AddIcon />
-                    </Button>
+            <Tooltip title='Lisää havainto'>
+                <Zoom in={!this.state.route.newSpotDialog}>
+                    <Button
+                        variant='fab'
+                        className={classes.fab}
+                        onClick={() => Router.dispatch('/new-spot')}
+                        color='secondary'
+                        children={<AddIcon />}
+                    />
                 </Zoom>
             </Tooltip>
         )
 
+        const appBar = (
+            <AppBar position="fixed" color="primary">
+                <Toolbar className={classes.fixedWidth}>
+                    <Typography
+                        variant='title'
+                        color='inherit'
+                        className={classes.appName}
+                        children={CONFIG.APP_NAME}
+                    />
+                </Toolbar>
+            </AppBar>
+        )
+
         return (
             <div className={classes.root}>
-                <AppBar position="static" color="primary">
-                    <Toolbar className={classes.fixedWidth}>
-                        <Typography type="title" color="inherit" className={classes.appName}>
-                            kvaakr.io
-                        </Typography>
-                    </Toolbar>
-                </AppBar>
+                {appBar}
 
                 <br />
 
                 <div className={classes.fixedWidth}>
-                    <Typography gutterBottom type="title">
+                    <Typography gutterBottom variant='title'>
                         <BeenHereIcon className={classes.icon} /> Viimeisimmät havainnot
                     </Typography>
 
-                    {[0,1,2,3,4].map(key => <SpotCard key={key} />)}
+                    <SpotList />
                 </div>
 
                 <NewSpotDialog
-                    open={this.state.newSpotDialog}
-                    onClose={this.toggleNewSpotDialog(false)}
+                    open={this.state.route.newSpotDialog}
+                    onClose={() => Router.dispatch('/')}
                 />
+
+                <WelcomeDialog />
 
                 {fab}
             </div>
         )
+    }
+
+    _setRoute(routeInfo) {
+        this.setState({
+            route           : routeInfo,
+        })
+    }
+
+    componentDidMount() {
+        Router.listen(payload => {
+            const {url, state} = payload
+
+            console.log({url, state})
+
+            let match
+            if(url.match(/^\/$/)) this._setRoute({frontPage: true})
+            if(match = url.match(/^\/spot\/(.+)$/)) this._setRoute({spot: match[1]})
+            if(url.match(/^\/new-spot$/)) this._setRoute({newSpotDialog: true})
+        })
+
+        Router.dispatch(location.href)
+
+        console.log('ROUTER', Router)
     }
 
     toggleNewSpotDialog = bool => () => {

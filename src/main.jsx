@@ -9,28 +9,21 @@ import accentColor from 'material-ui/colors/green'
 
 import MainLayout from './MainLayout.jsx'
 
-console.log(MainLayout)
-
-console.log({primaryColor, accentColor})
-
 const theme = createMuiTheme({
     palette         : {
-        primary         : {main: primaryColor['700']},
-        secondary       : {main: accentColor['A400']},
         type            : 'dark',
-    },
-}/*{
-    palette: {
-        primary: primaryColor,
-        secondary: accentColor,
-        type: 'dark',
-        background: {
-            default: '#1A1F24',
-            paper: '#2D323B',
-            paperHover: '#3A3F48',
+        primary         : {
+            main            : primaryColor['700']
+        },
+        secondary       : {
+            main            : accentColor['A400']
+        },
+        background      : {
+            default         : '#18191d',
+            paper           : '#282e33',
         },
     },
-}*/)
+})
 
 class App extends Component {
     render() {
