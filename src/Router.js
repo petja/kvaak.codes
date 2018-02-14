@@ -3,26 +3,39 @@ let routes          = []
 
 export function listen(callback) {
     listeners.push(callback)
-    return callback({url: location.pathname})
+    return callback({url: new URL(location.href)})
 }
 
 export function dispatch(url, state = {}, isReplace = false) {
-    console.log('url dispatch', {url, isReplace})
 
-    if(isReplace) {
-        history.replaceState(state, null, url)
-    } else {
-        history.pushState(state, null, url)
+    if (typeof url === 'function') {
+        const urlObj = new URL(location.href)
+        return dispatch(url(urlObj).href, state, isReplace)
     }
+
+    const urlObj = new URL(url, location.origin)
+    const newUrl = urlObj.pathname + urlObj.search
+
+    if (urlObj.origin !== location.origin) return location.href = urlObj.href
+
+    if (isReplace) {
+        history.replaceState(state, null, newUrl)
+    } else {
+        history.pushState(state, null, newUrl)
+    }
+
+    document.title = newUrl
+    console.log('url dispatch', {url, state, isReplace})
 
     listeners.forEach(listener => {
         listener({
             state,
-            url
+            url         : urlObj,
         })
     })
+
 }
 
 addEventListener('popstate', e => {
-    dispatch(location.pathname, e.state, true)
+    dispatch(location.href, e.state, true)
 })

@@ -39,7 +39,7 @@ class WelcomeDialog extends Component {
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={this.props.onClose} color="accent">Selvä homma</Button>
+                    <Button onClick={this.props.onClose} color='secondary'>Selvä homma</Button>
                 </DialogActions>
             </Dialog>
         )

@@ -20,11 +20,14 @@ const styles = theme => {
             background          : theme.palette.background.paper,
             transition          : '0.15s background',
             borderBottom        : `1px solid ${paperBorder}`,
-            padding             : `1em`,
+            padding             : `1.2em`,
             cursor              : `pointer`,
             '&:hover'           : {
                 background          : paperHoverBg,
             },
+        },
+        opacity             : {
+            opacity             : 0.5,
         },
     }
 }
@@ -35,12 +38,15 @@ class SpotCard extends Component {
         const {id, species, description, dateTime, count} = spot
 
         return (
-            <div className={classes.card} onClick={() => Router.dispatch(`/spot/${id}`)}>
+            <div className={classes.card} onClick={this.props.onClick}>
                 <Grid container alignItems='center'>
-                    <Grid item xs={12} md={9}>
-                        <Typography>{description}</Typography>
+                    <Grid item xs={6} sm={1}>
+                        <Typography>{count} <span className={classes.opacity}>&times;</span></Typography>
                     </Grid>
-                    <Grid item xs={12} md={3}>
+                    <Grid item xs={6} sm={8}>
+                        <Typography>{species}</Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={3}>
                         <Typography>{this.formatDate(dateTime)}</Typography>
                     </Grid>
                 </Grid>
@@ -52,7 +58,9 @@ class SpotCard extends Component {
 
         const diff = (Date.now() - Date.parse(date)) / 86400000
 
-        if (diff < 1 / 24) {
+        if (diff < 1 / 24 / 60) {
+            return Math.round(diff / 24 / 60 / 60) + ' sekuntia sitten'
+        } else if (diff < 1 / 24) {
             return Math.round(diff / 24 / 60) + ' minuuttia sitten'
         } else if (diff >= 1 / 24 && diff < 1) {
             return Math.round(diff / 24) + ' tuntia sitten'

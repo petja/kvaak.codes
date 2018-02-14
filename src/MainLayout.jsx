@@ -11,10 +11,13 @@ import Typography from 'material-ui/Typography'
 import Button from 'material-ui/Button'
 import Tooltip from 'material-ui/Tooltip'
 import Zoom from 'material-ui/transitions/Zoom'
+import IconButton from 'material-ui/IconButton'
+import Grid from 'material-ui/Grid'
 
 // Icons
 import AddIcon from 'material-ui-icons/Add'
 import BeenHereIcon from 'material-ui-icons/Beenhere'
+import SortByAlphaIcon from 'material-ui-icons/SortByAlpha'
 
 import SpotList from './SpotList.jsx'
 import NewSpotDialog from './NewSpotDialog.jsx'
@@ -44,6 +47,20 @@ const styles = theme => ({
     },
     appName             : {
         fontFamily          : '"Fugaz One", cursive',
+        position            : 'relative',
+        //margin              : '-0.5em auto 0 auto',
+        marginTop           : '-0.5em',
+        '&:after'           : {
+            opacity             : 0.75,
+            position            : 'absolute',
+            content             : '""',
+            background          : 'url("/for-vincit.png") right 50% no-repeat',
+            backgroundSize      : 'contain',
+            width               : '100%',
+            height              : '0.5em',
+            bottom              : '-0.5em',
+            right               : '0',
+        },
     },
 })
 
@@ -53,6 +70,7 @@ class MainLayout extends Component {
         route                       : {
             newSpotDialog               : false,
         },
+        isReversed                  : true,
     }
 
     render () {
@@ -85,6 +103,27 @@ class MainLayout extends Component {
             </AppBar>
         )
 
+        const subheader = (
+            <Grid container alignItems='center'>
+
+                <Grid item xs={11}>
+                    <Typography variant='title'>
+                        <BeenHereIcon className={classes.icon} /> Viimeisimmät havainnot
+                    </Typography>
+                </Grid>
+
+                <Grid item xs={1}>
+                    <Tooltip title='Järjestele laskevasti päivämäärän mukaan'>
+                        <IconButton
+                            children={<SortByAlphaIcon />}
+                            onClick={this._toggleSort}
+                        />
+                    </Tooltip>
+                </Grid>
+
+            </Grid>
+        )
+
         return (
             <div className={classes.root}>
                 {appBar}
@@ -92,11 +131,11 @@ class MainLayout extends Component {
                 <br />
 
                 <div className={classes.fixedWidth}>
-                    <Typography gutterBottom variant='title'>
-                        <BeenHereIcon className={classes.icon} /> Viimeisimmät havainnot
-                    </Typography>
-
-                    <SpotList />
+                    {subheader}
+                    <br />
+                    <SpotList
+                        isReversed={this.state.isReversed}
+                    />
                 </div>
 
                 <NewSpotDialog
@@ -117,19 +156,45 @@ class MainLayout extends Component {
         })
     }
 
+    _toggleSort = () => {
+        this.setState(state => {
+            state.isReversed = !state.isReversed
+
+            Router.dispatch(currentUrl => {
+                console.log({currentUrl})
+                currentUrl.searchParams.set(
+                    'sort',
+                    state.isReversed ? 'desc' : 'asc'
+                )
+
+                return currentUrl
+            }, {}, true)
+
+            return state
+        })
+    }
+
     componentDidMount() {
         Router.listen(payload => {
             const {url, state} = payload
 
-            console.log({url, state})
+            //console.log({url, state})
 
             let match
-            if(url.match(/^\/$/)) this._setRoute({frontPage: true})
-            if(match = url.match(/^\/spot\/(.+)$/)) this._setRoute({spot: match[1]})
-            if(url.match(/^\/new-spot$/)) this._setRoute({newSpotDialog: true})
+            if(url.pathname.match(/^\/$/)) {
+                const isReversed = url.searchParams.get('sort') !== 'asc'
+                console.log({isReversed})
+
+                this.setState({
+                    isReversed,
+                    route: {},
+                })
+            }
+
+            if(url.pathname.match(/^\/new-spot$/)) this._setRoute({newSpotDialog: true})
         })
 
-        Router.dispatch(location.href)
+        Router.dispatch(location.href, {}, true)
 
         console.log('ROUTER', Router)
     }

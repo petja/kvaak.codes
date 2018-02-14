@@ -13,7 +13,10 @@ const theme = createMuiTheme({
     palette         : {
         type            : 'dark',
         primary         : {
-            main            : primaryColor['700']
+            //main            : primaryColor['700']
+            main            : '#EF4036',
+            main            : '#F04E30',
+            main            : '#D03324',
         },
         secondary       : {
             main            : accentColor['A400']
