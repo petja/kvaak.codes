@@ -11,6 +11,7 @@ import Dialog, {
     DialogTitle,
 } from 'material-ui/Dialog'
 import Slide from 'material-ui/transitions/Slide'
+import { CircularProgress } from 'material-ui/Progress'
 import { MenuItem } from 'material-ui/Menu'
 import { FormControl, FormHelperText } from 'material-ui/Form'
 import Select from 'material-ui/Select'
@@ -30,6 +31,7 @@ function Transition(props) {
 class NewSpotDialog extends Component {
     state = {
         species             : [],
+        saving              : false,
     }
 
     render () {
@@ -61,6 +63,7 @@ class NewSpotDialog extends Component {
                     fullWidth
                     label="Määrä"
                     type="number"
+                    onChange={this._setValue('count')}
                 />
             </FormControl>
         )
@@ -71,6 +74,7 @@ class NewSpotDialog extends Component {
                     fullWidth
                     multiline
                     label="Kuvaus"
+                    onChange={this._setValue('description')}
                 />
             </FormControl>
         )
@@ -97,7 +101,14 @@ class NewSpotDialog extends Component {
 
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={this.props.onClose} color='secondary'>Tallenna havainto</Button>
+                    {this.state.saving ? <CircularProgress size={20} /> : null}
+
+                    <Button
+                        onClick={this._save}
+                        color='secondary'
+                        disabled={this.state.saving}
+                        children='Tallenna havainto'
+                    />
                 </DialogActions>
             </Dialog>
         )
@@ -106,6 +117,44 @@ class NewSpotDialog extends Component {
     _setSpecie = e => {
         this.setState({
             specie          : e.target.value,
+        })
+    }
+
+    _setValue = name => e => {
+        this.setState({
+            [name]          : e.target.value,
+        })
+    }
+
+    _save = () => {
+        const {specie, description, count} = this.state
+
+        this.setState({
+            saving              : true,
+        })
+
+        const body = JSON.stringify({
+            ayyyy               : 'lel',
+            species             : specie,
+            description,
+            count,
+            dateTime            : new Date(),
+        })
+
+        fetch(`${CONFIG.API_URL}/sightings`, {
+            method          : 'POST',
+            headers         : {
+                'Content-Type'  : 'application/json',
+            },
+            body,
+        }).then(resp => {
+            this.setState({
+                saving              : false,
+            })
+
+            this.props.onClose()
+
+            return resp.json()
         })
     }
 

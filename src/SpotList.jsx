@@ -1,22 +1,30 @@
 import React, {Component} from 'react'
 
+import classnames from 'classnames'
+
 import * as CONFIG from './Config.js'
 import * as Router from './Router.js'
 
 // Material UI
 import {withStyles} from 'material-ui/styles'
 
+import * as Sighting from './model/Sighting.js'
 import SpotCard from './SpotCard.jsx'
 
 const styles = theme => ({
-    animation               : {
+    expand                  : {
+        zIndex                  : 1,
         background              : theme.palette.background.paper,
-        //background              : '#808080',
         position                : 'fixed',
         maxWidth                : '70em',
-        zIndex                  : 1,
         width                   : '100%',
+        height                  : 'calc(100vh - 56px)',
+        top                     : '56px',
+        visibility              : 'hidden',
         boxShadow               : '0 0 0.5em rgba(0,0,0,0.5)',
+    },
+    animation               : {
+        zIndex                  : 2,
     },
 })
 
@@ -40,10 +48,22 @@ class SpotList extends Component {
 
         return (
             <div>
-                <div className={classes.animation} ref='animation' onClick={() => Router.dispatch('/')} />
+                <div
+                    className={classnames(classes.expand, classes.animation)}
+                    ref='animation'
+                />
+                <div
+                    className={classes.expand}
+                    ref='expand'
+                    onClick={() => Router.dispatch('/')}
+                />
                 {items}
             </div>
         )
+    }
+
+    _goBack = () => {
+        Router.dispatch('/')
     }
 
     _openSpot = (e, spotId) => {
@@ -52,6 +72,7 @@ class SpotList extends Component {
         }, () => {
             Router.dispatch(
                 `/spot/${spotId}`,
+                {listingUrl: location.href},
             )
         })
     }
@@ -66,27 +87,53 @@ class SpotList extends Component {
 
         animatable.style.visibility = 'visible'
 
-        animatable.animate([{
+        const animation = animatable.animate([{
             top             : `${startFrom}px`,
             height          : `${offsetHeight}px`,
             opacity         : 0,
         },{
-            top             : `64px`,
-            height          : `calc(100vh - 64px)`,
+            top             : `56px`,
+            height          : `calc(100vh - 56px)`,
             opacity         : 1,
         }], {
-            duration        : 250,
+            duration        : 200,
             fill            : 'forwards',
         })
+
+        animation.onfinish = this._revealExpand
+    }
+
+    _revealExpand = () => {
+        const animatable = this.refs.animation
+        const expand = this.refs.expand
+
+        expand.style.visibility = 'visible'
+
+        const animation = animatable.animate([{
+            opacity         : 1,
+        },{
+            opacity         : 0,
+        }], {
+            duration        : 200,
+            fill            : 'forwards',
+        })
+
+        animation.onfinish = () => {
+            animatable.style.visibility = 'hidden'
+        }
     }
 
     _showCloseAnimation = () => {
         const {offsetTop, offsetHeight} = this.state.expandOrigin || document.body
         const animatable = this.refs.animation
+        const expand = this.refs.expand
 
         console.log({offsetTop, offsetHeight})
 
         const startFrom = offsetTop - document.body.scrollTop
+
+        expand.style.visibility = 'hidden'
+        animatable.style.visibility = 'visible'
 
         const animation = animatable.animate([{
             top             : `64px`,
@@ -97,7 +144,7 @@ class SpotList extends Component {
             height          : `${offsetHeight}px`,
             opacity         : 0,
         }], {
-            duration        : 250,
+            duration        : 200,
             fill            : 'forwards',
         })
 
@@ -141,10 +188,7 @@ class SpotList extends Component {
 
     // Get all sightings from the API and render them out
     _refreshData = () => {
-
-        fetch(`${CONFIG.API_URL}/sightings`).then(resp => {
-            return resp.json()
-        }).then(sightings => {
+        Sighting.getAll().then(sightings => {
 
             this._setResults(sightings)
 

@@ -18,10 +18,14 @@ import Grid from 'material-ui/Grid'
 import AddIcon from 'material-ui-icons/Add'
 import BeenHereIcon from 'material-ui-icons/Beenhere'
 import SortByAlphaIcon from 'material-ui-icons/SortByAlpha'
+import InsertChartIcon from 'material-ui-icons/InsertChart'
+
+import * as Sighting from './model/Sighting.js'
 
 import SpotList from './SpotList.jsx'
 import NewSpotDialog from './NewSpotDialog.jsx'
 import WelcomeDialog from './WelcomeDialog.jsx'
+import Stats from './Stats.jsx'
 
 const styles = theme => ({
     root                : {
@@ -71,6 +75,8 @@ class MainLayout extends Component {
             newSpotDialog               : false,
         },
         isReversed                  : true,
+   
+        sightings           : [],
     }
 
     render () {
@@ -104,16 +110,16 @@ class MainLayout extends Component {
         )
 
         const subheader = (
-            <Grid container alignItems='center'>
+            <Grid container alignItems='center' spacing={0}>
 
-                <Grid item xs={11}>
+                <Grid item xs={9}>
                     <Typography variant='title'>
                         <BeenHereIcon className={classes.icon} /> Viimeisimmät havainnot
                     </Typography>
                 </Grid>
 
-                <Grid item xs={1}>
-                    <Tooltip title='Järjestele laskevasti päivämäärän mukaan'>
+                <Grid item xs={3} style={{textAlign: 'right'}}>
+                    <Tooltip title='Järjestele havaintoajankohdan mukaan'>
                         <IconButton
                             children={<SortByAlphaIcon />}
                             onClick={this._toggleSort}
@@ -131,11 +137,26 @@ class MainLayout extends Component {
                 <br />
 
                 <div className={classes.fixedWidth}>
+                    <Typography variant='title'>
+                        <InsertChartIcon className={classes.icon} /> Tilastot
+                    </Typography>
+
+                    <Stats
+                        data={this.state.sightings}
+                        species={[{"name":"mallard"},{"name":"redhead"},{"name":"gadwall"},{"name":"canvasback"},{"name":"lesser scaup"}]}
+                    />
+
                     {subheader}
+
                     <br />
+
                     <SpotList
                         isReversed={this.state.isReversed}
                     />
+
+                    <br />
+
+                    <Button color='secondary'>Lisää havaintoja</Button>
                 </div>
 
                 <NewSpotDialog
@@ -148,6 +169,16 @@ class MainLayout extends Component {
                 {fab}
             </div>
         )
+    }
+
+    _refreshData = () => {
+        Sighting.getAll().then(sightings => {
+
+            this.setState({
+                sightings
+            })
+
+        })
     }
 
     _setRoute(routeInfo) {
@@ -175,6 +206,8 @@ class MainLayout extends Component {
     }
 
     componentDidMount() {
+        this._refreshData()
+
         Router.listen(payload => {
             const {url, state} = payload
 

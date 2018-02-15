@@ -54,18 +54,32 @@ class SpotCard extends Component {
         )
     }
 
+    componentDidMount() {
+        setInterval(() => {
+            this.setState({
+                time            : Date.now(),
+            })
+        }, 1000)
+    }
+
     formatDate = date => {
 
-        const diff = (Date.now() - Date.parse(date)) / 86400000
+        const diff = (Date.now() - Date.parse(date)) / 1000
+        const ONE_HOUR = 3600
+        const ONE_DAY = ONE_HOUR * 24
 
-        if (diff < 1 / 24 / 60) {
-            return Math.round(diff / 24 / 60 / 60) + ' sekuntia sitten'
-        } else if (diff < 1 / 24) {
-            return Math.round(diff / 24 / 60) + ' minuuttia sitten'
-        } else if (diff >= 1 / 24 && diff < 1) {
-            return Math.round(diff / 24) + ' tuntia sitten'
+        if (diff < 60) {
+            return Math.round(diff) + ' sekuntia sitten'
+
+        } else if (diff >= 60 && diff < ONE_HOUR) {
+            return Math.round(diff / 60) + ' minuuttia sitten'
+
+        } else if (diff >= ONE_HOUR && diff < ONE_DAY) {
+            return Math.round(diff / 60 / 60) + ' tuntia sitten'
+
         } else {
-            return Math.round(diff) + ' päivää sitten'
+            return Math.round(diff / 60 / 60 / 24) + ' päivää sitten'
+
         }
     }
 }

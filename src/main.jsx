@@ -2,12 +2,16 @@ import React, {Component} from 'react'
 import {render} from 'react-dom'
 
 import PropTypes from 'prop-types'
+import color from 'color'
 
 import { MuiThemeProvider, createMuiTheme, withStyles } from 'material-ui/styles'
 import primaryColor from 'material-ui/colors/deepOrange'
-import accentColor from 'material-ui/colors/green'
+import accentColor from 'material-ui/colors/yellow'
 
 import MainLayout from './MainLayout.jsx'
+
+const defaultColor      = '#18191d'
+const paperColor        = color(defaultColor).lighten(0.5).hex()
 
 const theme = createMuiTheme({
     palette         : {
@@ -19,11 +23,11 @@ const theme = createMuiTheme({
             main            : '#D03324',
         },
         secondary       : {
-            main            : accentColor['A400']
+            main            : accentColor['500']
         },
         background      : {
-            default         : '#18191d',
-            paper           : '#282e33',
+            default         : defaultColor,
+            paper           : paperColor,
         },
     },
 })
