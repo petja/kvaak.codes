@@ -3,7 +3,7 @@ let routes          = []
 
 export function listen(callback) {
     listeners.push(callback)
-    return callback({url: new URL(location.href)})
+    dispatch(location.href, {}, true)
 }
 
 export function dispatch(url, state = {}, isReplace = false) {
