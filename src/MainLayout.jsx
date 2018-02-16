@@ -1,9 +1,12 @@
 import React, {Component} from 'react'
+
 import PropTypes from 'prop-types'
+import color from 'color'
 
 import * as CONFIG from './Config.js'
 import * as Router from './Router.js'
 
+// Material UI
 import { withStyles } from 'material-ui/styles'
 import AppBar from 'material-ui/AppBar'
 import Toolbar from 'material-ui/Toolbar'
@@ -27,46 +30,59 @@ import NewSpotDialog from './NewSpotDialog.jsx'
 import WelcomeDialog from './WelcomeDialog.jsx'
 import Stats from './Stats.jsx'
 
-const styles = theme => ({
-    root                : {
-        background          : theme.palette.background.default,
-        width               : '100%',
-        minHeight           : '100%',
-        paddingTop          : '5em',
-        paddingBottom       : '2em',
-        boxSizing           : 'border-box',
-    },
-    fab                 : {
-        position            : 'fixed',
-        bottom              : theme.spacing.unit * 5,
-        right               : theme.spacing.unit * 5,
-    },
-    fixedWidth          : {
-        width               : '100%',
-        maxWidth            : '70em',
-        margin              : '0 auto',
-    },
-    icon                : {
-        verticalAlign       : 'middle',
-    },
-    appName             : {
-        fontFamily          : '"Fugaz One", cursive',
-        position            : 'relative',
-        //margin              : '-0.5em auto 0 auto',
-        marginTop           : '-0.5em',
-        '&:after'           : {
-            opacity             : 0.75,
-            position            : 'absolute',
-            content             : '""',
-            background          : 'url("/for-vincit.png") right 50% no-repeat',
-            backgroundSize      : 'contain',
+const styles = theme => {
+    const bgColor = theme.palette.background.default
+    const bgColorAlpha = color(bgColor).alpha(0).toString()
+
+    return {
+        root                : {
+            background          : bgColor,
             width               : '100%',
-            height              : '0.5em',
-            bottom              : '-0.5em',
-            right               : '0',
+            minHeight           : '100%',
+            paddingTop          : '5em',
+            paddingBottom       : '2em',
+            boxSizing           : 'border-box',
         },
-    },
-})
+        fab                 : {
+            position            : 'fixed',
+            bottom              : theme.spacing.unit * 5,
+            right               : theme.spacing.unit * 5,
+        },
+        fixedWidth          : {
+            width               : '100%',
+            maxWidth            : '70em',
+            margin              : '0 auto',
+        },
+        icon                : {
+            verticalAlign       : 'middle',
+        },
+        appName             : {
+            fontFamily          : '"Fugaz One", cursive',
+            position            : 'relative',
+            //margin              : '-0.5em auto 0 auto',
+            marginTop           : '-0.5em',
+            '&:after'           : {
+                opacity             : 0.75,
+                position            : 'absolute',
+                content             : '""',
+                background          : 'url("/for-vincit.png") right 50% no-repeat',
+                backgroundSize      : 'contain',
+                width               : '100%',
+                height              : '0.5em',
+                bottom              : '-0.5em',
+                right               : '0',
+            },
+        },
+        stickyHeader        : {
+            position            : 'sticky',
+            top                 : '56px',
+            paddingTop          : '16px',
+            paddingBottom       : '8px',
+            zIndex              : 1,
+            background          : `linear-gradient(top, ${bgColor} 0%, ${bgColor} 50%, ${bgColorAlpha} 100%)`,
+        },
+    }
+}
 
 class MainLayout extends Component {
 
@@ -110,11 +126,11 @@ class MainLayout extends Component {
         )
 
         const subheader = (
-            <Grid container alignItems='center' spacing={0}>
+            <Grid container alignItems='center' spacing={0} className={classes.stickyHeader}>
 
                 <Grid item xs={9}>
                     <Typography variant='title'>
-                        <BeenHereIcon className={classes.icon} /> Viimeisimmät havainnot
+                        Havainnot
                     </Typography>
                 </Grid>
 
@@ -137,10 +153,6 @@ class MainLayout extends Component {
                 <br />
 
                 <div className={classes.fixedWidth}>
-                    <Typography variant='title'>
-                        <InsertChartIcon className={classes.icon} /> Tilastot
-                    </Typography>
-
                     <Stats
                         data={this.state.sightings}
                         species={[{"name":"mallard"},{"name":"redhead"},{"name":"gadwall"},{"name":"canvasback"},{"name":"lesser scaup"}]}
@@ -148,15 +160,10 @@ class MainLayout extends Component {
 
                     {subheader}
 
-                    <br />
-
                     <SpotList
+                        sightings={this.state.sightings}
                         isReversed={this.state.isReversed}
                     />
-
-                    <br />
-
-                    <Button color='secondary'>Lisää havaintoja</Button>
                 </div>
 
                 <NewSpotDialog

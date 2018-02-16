@@ -7,6 +7,7 @@ import * as Router from './Router.js'
 
 // Material UI
 import {withStyles} from 'material-ui/styles'
+import Typography from 'material-ui/Typography'
 
 import * as Sighting from './model/Sighting.js'
 import SpotCard from './SpotCard.jsx'
@@ -34,9 +35,9 @@ class SpotList extends Component {
     }
 
     render() {
-        const {classes} = this.props
+        const {classes, sightings} = this.props
 
-        const items = this.state.sightings.map(spot => {
+        const items = this._sortResults().map(spot => {
             return (
                 <SpotCard
                     spot={spot}
@@ -56,7 +57,10 @@ class SpotList extends Component {
                     className={classes.expand}
                     ref='expand'
                     onClick={() => Router.dispatch('/')}
-                />
+                >
+                    <br /><br />
+                    <Typography>Klikkaa sulkeaksesi</Typography>
+                </div>
                 {items}
             </div>
         )
@@ -157,8 +161,6 @@ class SpotList extends Component {
     }
 
     componentDidMount() {
-        this._refreshData()
-
         Router.listen(payload => {
             const {url, state} = payload
 
@@ -168,30 +170,12 @@ class SpotList extends Component {
         })
     }
 
-    componentWillReceiveProps(nextProps) {
-        this._setResults(this.state.sightings, nextProps.isReversed)
-    }
-
-    _setResults = (sightings, isReversed = this.props.isReversed) => {
-        console.log('b', {isReversed})
-
+    _sortResults = () => {
         // Sort by timestamp
-        sightings = sightings.sort((a, b) => {
-            if(isReversed) [a, b] = [b, a]
+
+        return [...this.props.sightings].sort((a, b) => {
+            if(this.props.isReversed) [a, b] = [b, a]
             return Date.parse(a.dateTime) - Date.parse(b.dateTime)
-        })
-
-        this.setState({
-            sightings
-        })
-    }
-
-    // Get all sightings from the API and render them out
-    _refreshData = () => {
-        Sighting.getAll().then(sightings => {
-
-            this._setResults(sightings)
-
         })
     }
 }

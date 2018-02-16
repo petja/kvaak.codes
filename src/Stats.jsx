@@ -1,6 +1,8 @@
 import React, {Component} from 'react'
 
 import { withStyles } from 'material-ui/styles'
+import Typography from 'material-ui/Typography'
+
 import {BarChart, CartesianGrid, ResponsiveContainer, XAxis, Tooltip, Legend, Bar} from 'recharts'
 import color from 'color'
 
@@ -10,7 +12,7 @@ let currentColor = '#D03324'
 const barColors = [currentColor]
 
 for(let i = 0; i < 10; i++) {
-    currentColor = color(currentColor).lighten(0.125)
+    currentColor = color(currentColor).darken(0.125)
     barColors.push(currentColor.hex())
 }
 
@@ -29,7 +31,11 @@ class Stats extends Component {
         const ducksByMonth = {}
 
         // Loop thru every sighting
-        data.forEach(spot => {
+        data.sort((a, b) => {
+
+            return Date.parse(a.dateTime) - Date.parse(b.dateTime)
+
+        }).forEach(spot => {
             const date = new Date(spot.dateTime)
             const yearMonth = date.getFullYear() + '-' + (date.getMonth() + 1)
 
@@ -49,22 +55,40 @@ class Stats extends Component {
 
         const bars = species.map((specie, index) => {
             const barColor = barColors[index]
-            return <Bar dataKey={specie.name} key={specie.name} stackId='a' fill={barColor} />
+            return (
+                <Bar
+                    dataKey={specie.name}
+                    key={specie.name}
+                    stackId='specie'
+                    unit=' kpl'
+                    fill={barColor}
+                />
+            )
         })
 
         const chart = (
             <BarChart width={800} height={400} data={Object.values(ducksByMonth)}>
                 <XAxis dataKey='yearMonth' />
-                <Tooltip />
+                <Tooltip cursor={{fill: 'rgba(0,0,0,0.1)'}} />
                 <Legend />
                 {bars}
             </BarChart>
         )
 
         return (
-            <ResponsiveContainer width='100%' height={200} className={classes.root}>
-                {chart}
-            </ResponsiveContainer>
+            <div>
+                <Typography
+                    variant='title'
+                    align='center'
+                    gutterBottom
+                >
+                    {data.length} bongausta
+                </Typography>
+
+                <ResponsiveContainer width='100%' height={200} className={classes.root}>
+                    {chart}
+                </ResponsiveContainer>
+            </div>
         )
     }
 
