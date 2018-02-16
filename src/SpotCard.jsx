@@ -1,6 +1,7 @@
 import React, {Component} from 'react'
 
 import * as Router from './Router.js'
+import RelativeTime from './RelativeTime.jsx'
 
 // Material UI
 import { withStyles } from 'material-ui/styles'
@@ -47,7 +48,9 @@ class SpotCard extends Component {
                         <Typography>{species}</Typography>
                     </Grid>
                     <Grid item xs={12} sm={3}>
-                        <Typography>{this.formatDate(dateTime)}</Typography>
+                        <Typography>
+                            <RelativeTime date={dateTime} />
+                        </Typography>
                     </Grid>
                 </Grid>
             </div>
@@ -60,27 +63,6 @@ class SpotCard extends Component {
                 time            : Date.now(),
             })
         }, 1000)
-    }
-
-    formatDate = date => {
-
-        const diff = (Date.now() - Date.parse(date)) / 1000
-        const ONE_HOUR = 3600
-        const ONE_DAY = ONE_HOUR * 24
-
-        if (diff < 60) {
-            return Math.round(diff) + ' sekuntia sitten'
-
-        } else if (diff >= 60 && diff < ONE_HOUR) {
-            return Math.round(diff / 60) + ' minuuttia sitten'
-
-        } else if (diff >= ONE_HOUR && diff < ONE_DAY) {
-            return Math.round(diff / 60 / 60) + ' tuntia sitten'
-
-        } else {
-            return Math.round(diff / 60 / 60 / 24) + ' päivää sitten'
-
-        }
     }
 }
 

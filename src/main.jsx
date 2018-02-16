@@ -30,6 +30,8 @@ const theme = createMuiTheme({
             paper           : paperColor,
         },
     },
+    typography      : {
+    },
 })
 
 class App extends Component {

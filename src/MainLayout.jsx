@@ -32,7 +32,7 @@ import Stats from './Stats.jsx'
 
 const styles = theme => {
     const bgColor = theme.palette.background.default
-    const bgColorAlpha = color(bgColor).alpha(0).toString()
+    //const bgColorAlpha = color(bgColor).alpha(0).toString()
 
     return {
         root                : {
@@ -79,7 +79,8 @@ const styles = theme => {
             paddingTop          : '16px',
             paddingBottom       : '8px',
             zIndex              : 1,
-            background          : `linear-gradient(top, ${bgColor} 0%, ${bgColor} 50%, ${bgColorAlpha} 100%)`,
+            background          : bgColor,
+            //background          : `linear-gradient(top, ${bgColor} 0%, ${bgColor} 50%, ${bgColorAlpha} 100%)`,
         },
     }
 }
@@ -87,12 +88,9 @@ const styles = theme => {
 class MainLayout extends Component {
 
     state = {
-        route                       : {
-            newSpotDialog               : false,
-        },
         isReversed                  : true,
-   
-        sightings           : [],
+        newSpotDialog               : false,
+        sightings                   : [],
     }
 
     render () {
@@ -100,7 +98,7 @@ class MainLayout extends Component {
 
         const fab = (
             <Tooltip title='Lisää havainto'>
-                <Zoom in={!this.state.route.newSpotDialog}>
+                <Zoom in={this.state.frontPage}>
                     <Button
                         variant='fab'
                         className={classes.fab}
@@ -130,7 +128,7 @@ class MainLayout extends Component {
 
                 <Grid item xs={9}>
                     <Typography variant='title'>
-                        Havainnot
+                        Bongaushistoria
                     </Typography>
                 </Grid>
 
@@ -167,7 +165,7 @@ class MainLayout extends Component {
                 </div>
 
                 <NewSpotDialog
-                    open={this.state.route.newSpotDialog}
+                    open={this.state.newSpotDialog}
                     onClose={() => Router.dispatch('/')}
                 />
 
@@ -188,24 +186,19 @@ class MainLayout extends Component {
         })
     }
 
-    _setRoute(routeInfo) {
-        this.setState({
-            route           : routeInfo,
-        })
-    }
-
     _toggleSort = () => {
         this.setState(state => {
             state.isReversed = !state.isReversed
 
             Router.dispatch(currentUrl => {
-                console.log({currentUrl})
+
                 currentUrl.searchParams.set(
                     'sort',
                     state.isReversed ? 'desc' : 'asc'
                 )
 
                 return currentUrl
+
             }, {}, true)
 
             return state
@@ -218,20 +211,33 @@ class MainLayout extends Component {
         Router.listen(payload => {
             const {url, state} = payload
 
-            //console.log({url, state})
-
             let match
+
             if(url.pathname.match(/^\/$/)) {
+
                 const isReversed = url.searchParams.get('sort') !== 'asc'
-                console.log({isReversed})
 
                 this.setState({
                     isReversed,
-                    route: {},
+                    frontPage           : true,
+                    newSpotDialog       : false,
                 })
-            }
 
-            if(url.pathname.match(/^\/new-spot$/)) this._setRoute({newSpotDialog: true})
+            } else if(url.pathname.match(/^\/new-spot$/)) {
+
+                this.setState({
+                    frontPage           : false,
+                    newSpotDialog       : true,
+                })
+
+            } else {
+
+                this.setState({
+                    frontPage           : false,
+                    newSpotDialog       : false,
+                })
+
+            }
         })
 
         Router.dispatch(location.href, {}, true)

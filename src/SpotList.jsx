@@ -8,9 +8,12 @@ import * as Router from './Router.js'
 // Material UI
 import {withStyles} from 'material-ui/styles'
 import Typography from 'material-ui/Typography'
+import Divider from 'material-ui/Divider'
+import Button from 'material-ui/Button'
 
 import * as Sighting from './model/Sighting.js'
 import SpotCard from './SpotCard.jsx'
+import RelativeTime from './RelativeTime.jsx'
 
 const styles = theme => ({
     expand                  : {
@@ -23,15 +26,22 @@ const styles = theme => ({
         top                     : '56px',
         visibility              : 'hidden',
         boxShadow               : '0 0 0.5em rgba(0,0,0,0.5)',
+        textAlign               : 'center',
     },
     animation               : {
         zIndex                  : 2,
+    },
+    quote                   : {
+        fontFamily              : '"Roboto Slab"',
+        fontSize                : '1.2em',
+        color                   : theme.typography.body1.color,
     },
 })
 
 class SpotList extends Component {
     state = {
         sightings           : [],
+        openSpot            : {},
     }
 
     render() {
@@ -53,26 +63,56 @@ class SpotList extends Component {
                     className={classnames(classes.expand, classes.animation)}
                     ref='animation'
                 />
+
                 <div
                     className={classes.expand}
                     ref='expand'
-                    onClick={() => Router.dispatch('/')}
                 >
                     <br /><br />
-                    <Typography>Klikkaa sulkeaksesi</Typography>
+
+                    <Typography variant='display1'>havainto #{this.state.openSpot.id}</Typography>
+
+                    <Typography>
+                        {this.state.openSpot.species}&emsp;&middot;&emsp;
+                        {this.state.openSpot.count} kpl&emsp;&middot;&emsp;
+                        <RelativeTime date={this.state.openSpot.dateTime} />
+                    </Typography>
+
+                    <br />
+
+                    <Divider />
+
+                    <blockquote className={classes.quote}>
+                        {this.state.openSpot.description}
+                    </blockquote>
+
+                    <Button color='secondary' onClick={this._goBack}>Paluu</Button>
                 </div>
+
                 {items}
             </div>
         )
     }
 
     _goBack = () => {
-        Router.dispatch('/')
+        this._showCloseAnimation().then(() => {
+            this.setState({
+                expandOrigin        : null,
+                openSpot            : {},
+            })
+
+            Router.dispatch('/')
+        })
     }
 
     _openSpot = (e, spotId) => {
+        const currentSpot = this.props.sightings.find(sighting => {
+            return sighting.id === spotId
+        })
+
         this.setState({
             expandOrigin        : e.currentTarget,
+            openSpot            : currentSpot,
         }, () => {
             Router.dispatch(
                 `/spot/${spotId}`,
@@ -152,9 +192,12 @@ class SpotList extends Component {
             fill            : 'forwards',
         })
 
-        animation.onfinish = () => {
-            animatable.style.visibility = 'hidden'
-        }
+        return new Promise(fulfill => {
+            animation.onfinish = () => {
+                animatable.style.visibility = 'hidden'
+                fulfill()
+            }
+        })
     }
 
     _closeSpot = e => {
@@ -166,7 +209,6 @@ class SpotList extends Component {
 
             let match
             if(match = url.pathname.match(/^\/spot\/(.+)$/)) this._showOpenAnimation()
-            if(match = url.pathname.match(/^\/$/) && this.state.expandOrigin) this._showCloseAnimation()
         })
     }
 
