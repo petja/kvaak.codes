@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 import color from 'color'
 
 import { MuiThemeProvider, createMuiTheme, withStyles } from 'material-ui/styles'
-import primaryColor from 'material-ui/colors/deepOrange'
+//import primaryColor from 'material-ui/colors/deepOrange'
 import accentColor from 'material-ui/colors/yellow'
 
 import MainLayout from './MainLayout.jsx'
@@ -17,9 +17,6 @@ const theme = createMuiTheme({
     palette         : {
         type            : 'dark',
         primary         : {
-            //main            : primaryColor['700']
-            main            : '#EF4036',
-            main            : '#F04E30',
             main            : '#D03324',
         },
         secondary       : {
@@ -29,8 +26,6 @@ const theme = createMuiTheme({
             default         : defaultColor,
             paper           : paperColor,
         },
-    },
-    typography      : {
     },
 })
 
@@ -43,8 +38,6 @@ class App extends Component {
         )
     }
 }
-
-console.log(<App />)
 
 document.addEventListener('DOMContentLoaded', function() {
     render(<App />, document.querySelector('#root'));

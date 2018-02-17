@@ -30,44 +30,78 @@ function Transition(props) {
 
 class NewSpotDialog extends Component {
     state = {
-        species             : [],
         saving              : false,
+
+        // Default values of the form
+        count               : 1,
+        specie              : '',
+        description         : '',
     }
 
     render () {
         const {classes} = this.props
 
-        const specieOptions = this.state.species.map(specie => {
+        // Get name of each species, from the object
+        const species = this.props.species.map(specie => {
+            return specie.name
+        }).sort()
+
+        // Validate user input
+        const errors = {
+            COUNT           : (parseInt(this.state.count) < 1 || this.state.count === '' ? 'Syötä luku joka on suurempi tai yhtäsuuri kuin 1' : null),
+            SPECIES         : (!species.includes(this.state.specie) ? 'Valitse lajike' : null),
+        }
+
+        // Check if there's errors, if there's even one, prevent sending form
+        const hasErrors = !!(Object.values(errors).find(error => error))
+
+        // Menu items for the species dropdown
+        const specieOptions = species.map(name => {
             return (
-                <MenuItem value={specie.name} key={specie.name}>{specie.name}</MenuItem>
+                <MenuItem value={name} key={name}>{name}</MenuItem>
             )
         })
 
+        // Dropdown to select species
         const specieSelect = (
-            <FormControl className={classes.formControl} fullWidth>
+            <FormControl
+                className={classes.formControl}
+                error={!!errors.SPECIES}
+                fullWidth
+            >
                 <InputLabel htmlFor="specie">Laji</InputLabel>
                 <Select
                     value={this.state.specie || ''}
-                    onChange={this._setSpecie}
+                    onChange={this._setValue('specie')}
                     input={<Input name="specie" id="specie" />}
                 >
                     <MenuItem value=''><em>Ei valintaa</em></MenuItem>
                     {specieOptions}
                 </Select>
+                {errors.SPECIES ? <FormHelperText>{errors.SPECIES}</FormHelperText> : null}
             </FormControl>
         )
 
+        // Number input to give number of ducks
         const countInput = (
             <FormControl className={classes.formControl} fullWidth>
                 <TextField
                     fullWidth
                     label="Määrä"
                     type="number"
+                    value={this.state.count}
                     onChange={this._setValue('count')}
+                    error={!!errors.COUNT}
+                    helperText={errors.COUNT}
+                    inputProps={{
+                        max         : 9999,
+                        min         : 1,
+                    }}
                 />
             </FormControl>
         )
 
+        // Text input for optional description
         const descriptionInput = (
             <FormControl className={classes.formControl} fullWidth>
                 <TextField
@@ -89,7 +123,7 @@ class NewSpotDialog extends Component {
                 <DialogTitle>Lisää uusi havainto</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Lisää uusi ankkahavainto <strong>{CONFIG.APP_NAME}</strong> -järjestelmään
+                        Syötä <strong>{CONFIG.APP_NAME}</strong> -järjestelmään lisättävän uuden ankkahavainnon tiedot
                     </DialogContentText>
                     <br /><br />
 
@@ -106,18 +140,12 @@ class NewSpotDialog extends Component {
                     <Button
                         onClick={this._save}
                         color='secondary'
-                        disabled={this.state.saving}
+                        disabled={this.state.saving || hasErrors}
                         children='Tallenna havainto'
                     />
                 </DialogActions>
             </Dialog>
         )
-    }
-
-    _setSpecie = e => {
-        this.setState({
-            specie          : e.target.value,
-        })
     }
 
     _setValue = name => e => {
@@ -126,6 +154,7 @@ class NewSpotDialog extends Component {
         })
     }
 
+    // Post new sightings to the server
     _save = () => {
         const {specie, description, count} = this.state
 
@@ -134,7 +163,6 @@ class NewSpotDialog extends Component {
         })
 
         const body = JSON.stringify({
-            ayyyy               : 'lel',
             species             : specie,
             description,
             count,
@@ -158,13 +186,11 @@ class NewSpotDialog extends Component {
         })
     }
 
-    componentDidMount() {
-        fetch(`${CONFIG.API_URL}/species`).then(resp => {
-            return resp.json()
-        }).then(species => {
-            this.setState({
-                species
-            })
+    componentWillReceiveProps(nextProps) {
+        if(nextProps.species.length < 1) return
+
+        this.setState({
+            specie              : nextProps.species[0].name,
         })
     }
 }

@@ -19,11 +19,10 @@ import Grid from 'material-ui/Grid'
 
 // Icons
 import AddIcon from 'material-ui-icons/Add'
-import BeenHereIcon from 'material-ui-icons/Beenhere'
 import SortByAlphaIcon from 'material-ui-icons/SortByAlpha'
-import InsertChartIcon from 'material-ui-icons/InsertChart'
 
 import * as Sighting from './model/Sighting.js'
+import * as Species from './model/Species.js'
 
 import SpotList from './SpotList.jsx'
 import NewSpotDialog from './NewSpotDialog.jsx'
@@ -91,6 +90,7 @@ class MainLayout extends Component {
         isReversed                  : true,
         newSpotDialog               : false,
         sightings                   : [],
+        species                     : [],
     }
 
     render () {
@@ -153,7 +153,7 @@ class MainLayout extends Component {
                 <div className={classes.fixedWidth}>
                     <Stats
                         data={this.state.sightings}
-                        species={[{"name":"mallard"},{"name":"redhead"},{"name":"gadwall"},{"name":"canvasback"},{"name":"lesser scaup"}]}
+                        species={this.state.species}
                     />
 
                     {subheader}
@@ -166,6 +166,7 @@ class MainLayout extends Component {
 
                 <NewSpotDialog
                     open={this.state.newSpotDialog}
+                    species={this.state.species}
                     onClose={() => Router.dispatch('/')}
                 />
 
@@ -177,6 +178,16 @@ class MainLayout extends Component {
     }
 
     _refreshData = () => {
+        // Fetch all species
+        Species.getAll().then(species => {
+
+            this.setState({
+                species
+            })
+
+        })
+
+        // Fetch all sightings
         Sighting.getAll().then(sightings => {
 
             this.setState({
@@ -208,6 +219,7 @@ class MainLayout extends Component {
     componentDidMount() {
         this._refreshData()
 
+        // Routings
         Router.listen(payload => {
             const {url, state} = payload
 

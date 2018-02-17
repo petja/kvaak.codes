@@ -70,7 +70,7 @@ class Stats extends Component {
             <BarChart width={800} height={400} data={Object.values(ducksByMonth)}>
                 <XAxis dataKey='yearMonth' />
                 <Tooltip cursor={{fill: 'rgba(0,0,0,0.1)'}} />
-                <Legend />
+                <Legend iconType='circle' />
                 {bars}
             </BarChart>
         )
