@@ -28,6 +28,7 @@ import SpotList from './SpotList.jsx'
 import NewSpotDialog from './NewSpotDialog.jsx'
 import WelcomeDialog from './WelcomeDialog.jsx'
 import Stats from './Stats.jsx'
+import SightExpand from './SightExpand.jsx'
 
 const styles = theme => {
     const bgColor = theme.palette.background.default
@@ -94,7 +95,8 @@ class MainLayout extends Component {
     }
 
     render () {
-        const {classes} = this.props;
+        const {classes} = this.props
+        const {sightings} = this.state
 
         const fab = (
             <Tooltip title='Lisää havainto'>
@@ -144,6 +146,15 @@ class MainLayout extends Component {
             </Grid>
         )
 
+        const sightExpand = (
+            <SightExpand
+                sighting={
+                    sightings.find(sighting => sighting.id === this.state.sightingId)
+                }
+                onClose={this._closeExpand}
+            />
+        )
+
         return (
             <div className={classes.root}>
                 {appBar}
@@ -162,6 +173,8 @@ class MainLayout extends Component {
                         sightings={this.state.sightings}
                         isReversed={this.state.isReversed}
                     />
+
+                    {sightExpand}
                 </div>
 
                 <NewSpotDialog
@@ -175,6 +188,10 @@ class MainLayout extends Component {
                 {fab}
             </div>
         )
+    }
+
+    _closeExpand = () => {
+        Router.dispatch('/')
     }
 
     _refreshData = () => {
@@ -231,6 +248,7 @@ class MainLayout extends Component {
 
                 this.setState({
                     isReversed,
+                    sightingId          : null,
                     frontPage           : true,
                     newSpotDialog       : false,
                 })
@@ -238,13 +256,23 @@ class MainLayout extends Component {
             } else if(url.pathname.match(/^\/new-spot$/)) {
 
                 this.setState({
+                    sightingId          : null,
                     frontPage           : false,
                     newSpotDialog       : true,
+                })
+
+            } else if(match = url.pathname.match(/^\/sighting\/(.+)$/)) {
+
+                this.setState({
+                    sightingId          : match[1],
+                    frontPage           : false,
+                    newSpotDialog       : false,
                 })
 
             } else {
 
                 this.setState({
+                    sightingId          : null,
                     frontPage           : false,
                     newSpotDialog       : false,
                 })
