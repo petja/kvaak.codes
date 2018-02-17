@@ -181,6 +181,7 @@ class MainLayout extends Component {
                     open={this.state.newSpotDialog}
                     species={this.state.species}
                     onClose={() => Router.dispatch('/')}
+                    onCreate={this._refreshData}
                 />
 
                 <WelcomeDialog />

@@ -180,6 +180,7 @@ class NewSpotDialog extends Component {
                 saving              : false,
             })
 
+            this.props.onCreate()
             this.props.onClose()
 
             return resp.json()
