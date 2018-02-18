@@ -104,7 +104,7 @@ class MainLayout extends Component {
                     <Button
                         variant='fab'
                         className={classes.fab}
-                        onClick={() => Router.dispatch('/new-spot')}
+                        onClick={() => Router.dispatch('/new')}
                         color='secondary'
                         children={<AddIcon />}
                     />
@@ -146,11 +146,20 @@ class MainLayout extends Component {
             </Grid>
         )
 
+        const copyright = (
+            <Typography variant='caption' align='center'>
+                <br /><br />
+                &copy; {new Date().getFullYear()} Petja Touru<br />
+                Lähdekoodi julkaistu <a href='https://github.com/petja/kvaak.codes'>Githubissa</a>
+            </Typography>
+        )
+
         const sightExpand = (
             <SightExpand
                 sighting={
                     sightings.find(sighting => sighting.id === this.state.sightingId)
                 }
+                expandOrigin={this.state.expandOrigin}
                 onClose={this._closeExpand}
             />
         )
@@ -184,7 +193,7 @@ class MainLayout extends Component {
                     onCreate={this._refreshData}
                 />
 
-                <WelcomeDialog />
+                {copyright}
 
                 {fab}
             </div>
@@ -254,7 +263,7 @@ class MainLayout extends Component {
                     newSpotDialog       : false,
                 })
 
-            } else if(url.pathname.match(/^\/new-spot$/)) {
+            } else if(url.pathname.match(/^\/new$/)) {
 
                 this.setState({
                     sightingId          : null,
@@ -266,6 +275,7 @@ class MainLayout extends Component {
 
                 this.setState({
                     sightingId          : match[1],
+                    expandOrigin        : state.expandOrigin,
                     frontPage           : false,
                     newSpotDialog       : false,
                 })

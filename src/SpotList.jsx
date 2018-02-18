@@ -10,32 +10,11 @@ import * as Sighting from './model/Sighting.js'
 import SpotCard from './SpotCard.jsx'
 
 const styles = theme => ({
-    expand                  : {
-        zIndex                  : 1,
-        background              : theme.palette.background.paper,
-        position                : 'fixed',
-        maxWidth                : '70em',
-        width                   : '100%',
-        height                  : 'calc(100vh - 56px)',
-        top                     : '56px',
-        visibility              : 'hidden',
-        boxShadow               : '0 0 0.5em rgba(0,0,0,0.5)',
-        textAlign               : 'center',
-    },
-    animation               : {
-        zIndex                  : 2,
-    },
-    quote                   : {
-        fontFamily              : '"Roboto Slab"',
-        fontSize                : '1.2em',
-        color                   : theme.typography.body1.color,
-    },
+    // Nothing here :)
 })
 
 class SpotList extends Component {
     state = {
-        sightings           : [],
-        openSpot            : {},
     }
 
     render() {
@@ -59,10 +38,13 @@ class SpotList extends Component {
     }
 
     _openSpot = (e, spotId) => {
-        Router.dispatch(
-            `/sighting/${spotId}`,
-            {listingUrl: location.href},
-        )
+        Router.dispatch(`/sighting/${spotId}`, {
+            listingUrl      : location.href,
+            expandOrigin    : {
+                offsetTop       : e.currentTarget.offsetTop,
+                offsetHeight    : e.currentTarget.offsetHeight,
+            },
+        })
     }
 
     _sortResults = () => {

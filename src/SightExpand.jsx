@@ -27,6 +27,7 @@ const styles = theme => ({
     },
     animation               : {
         zIndex                  : 2,
+        pointerEvents           : 'none',
     },
     quote                   : {
         fontFamily              : '"Roboto Slab"',
@@ -42,20 +43,16 @@ const animationConfig = {
 
 class SightExpand extends Component {
     state = {
-        expandOrigin            : null,
         sighting                : {},
     }
 
     render() {
-        const {classes, sighting} = this.props
-
-        if(!sighting) return null
-
-        const {id, species, count, description, dateTime} = sighting
+        const {classes} = this.props
+        const {id, species, count, description, dateTime} = this.state.sighting
 
         const animationElement = (
             <div
-                className={classnames(classes.expand, classes.animation)}
+                className={classnames(classes.root, classes.animation)}
                 ref='animation'
             />
         )
@@ -99,10 +96,8 @@ class SightExpand extends Component {
     }
 
     _showOpenAnimation = () => {
-        const {offsetTop, offsetHeight} = this.state.expandOrigin || document.body
+        const {offsetTop, offsetHeight} = this.props.expandOrigin || document.body
         const animatable = this.refs.animation
-
-        console.log({offsetTop, offsetHeight})
 
         const startFrom = offsetTop - document.body.scrollTop
 
@@ -111,24 +106,22 @@ class SightExpand extends Component {
         const animation = animatable.animate([{
             top             : `${startFrom}px`,
             height          : `${offsetHeight}px`,
-            opacity         : 0,
         },{
             top             : `56px`,
             height          : `calc(100vh - 56px)`,
-            opacity         : 1,
         }], animationConfig)
 
-        animation.onfinish = this._revealExpand
+        return animation
     }
 
     _showCloseAnimation = () => {
-        const {offsetTop, offsetHeight} = this.state.expandOrigin || document.body
+        const {offsetTop, offsetHeight} = this.props.expandOrigin || document.body
         const animatable = this.refs.animation
         const expand = this.refs.expand
 
-        console.log({offsetTop, offsetHeight})
-
         const startFrom = offsetTop - document.body.scrollTop
+
+        console.log(this.refs)
 
         expand.style.visibility = 'hidden'
         animatable.style.visibility = 'visible'
@@ -136,15 +129,10 @@ class SightExpand extends Component {
         const animation = animatable.animate([{
             top             : `64px`,
             height          : `calc(100vh - 64px)`,
-            opacity         : 1,
         },{
             top             : `${startFrom}px`,
             height          : `${offsetHeight}px`,
-            opacity         : 0,
-        }], {
-            duration        : 200,
-            fill            : 'forwards',
-        })
+        }], animationConfig)
 
         return new Promise(fulfill => {
             animation.onfinish = () => {
@@ -155,40 +143,56 @@ class SightExpand extends Component {
     }
 
     // Fade out overlay from the top of sighting info
-    _revealExpand = () => {
+    // Direction true: Fade out overlay after expanding card
+    // Direction false: Fade in overlay before collapsing card
+    _fadeOverlay = direction => {
         const animatable = this.refs.animation
         const expand = this.refs.expand
 
+        animatable.style.visibility = 'visible'
         expand.style.visibility = 'visible'
 
         const animation = animatable.animate([{
-            opacity         : 1,
+            opacity         : direction ? 1 : 0,
         },{
-            opacity         : 0,
+            opacity         : direction ? 0 : 1,
         }], animationConfig)
 
-        animation.onfinish = () => {
-            animatable.style.visibility = 'hidden'
-        }
+        return animation
     }
 
-    componentWillReceiveProps(nextProps) {
+    componentDidUpdate(currentProps) {
 
-        const currentProps = this.props
+        const nextProps = this.props
 
         const willOpen = nextProps.sighting
         const didOpen = currentProps.sighting
+
+        if(!this.refs.animation) return
+        console.log('did update', this.refs)
 
         // If sighting has been set to props
         if(willOpen && !didOpen) {
             this.setState({
                 sighting            : nextProps.sighting,
-                expandOrigin        : document.body,
-            }, () => {
-                this._showOpenAnimation()
             })
+
+            const ready = () => {
+                this.refs.expand.visibility = 'visible'
+                this._fadeOverlay(true)
+            }
+
+            if(!this.refs.animation) return ready()
+
+            const animation = this._showOpenAnimation()
+            animation.onfinish = ready
+
         } else if (!willOpen && didOpen) {
-            this._showCloseAnimation()
+            const animation = this._fadeOverlay(false)
+            animation.onfinish = () => {
+                this.refs.expand.visibility = 'hidden'
+                this._showCloseAnimation()
+            }
         }
 
     }

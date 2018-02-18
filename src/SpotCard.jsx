@@ -23,6 +23,8 @@ const styles = theme => {
             borderBottom        : `1px solid ${paperBorder}`,
             padding             : `1.2em`,
             cursor              : `pointer`,
+            userSelect          : 'none',
+            '-webkit-tap-highlight-color': 'transparent',
             '&:hover'           : {
                 background          : paperHoverBg,
             },
@@ -41,14 +43,14 @@ class SpotCard extends Component {
         return (
             <div className={classes.card} onClick={this.props.onClick}>
                 <Grid container alignItems='center'>
-                    <Grid item xs={6} sm={1}>
+                    <Grid item xs={2} sm={2}>
                         <Typography>{count} <span className={classes.opacity}>&times;</span></Typography>
                     </Grid>
-                    <Grid item xs={6} sm={8}>
+                    <Grid item xs={4} sm={4}>
                         <Typography>{species}</Typography>
                     </Grid>
-                    <Grid item xs={12} sm={3}>
-                        <Typography>
+                    <Grid item xs={6} sm={6}>
+                        <Typography align='right'>
                             <RelativeTime date={dateTime} />
                         </Typography>
                     </Grid>
