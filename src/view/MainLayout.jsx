@@ -3,8 +3,10 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import color from 'color'
 
-import * as CONFIG from './Config.js'
-import * as Router from './Router.js'
+import * as CONFIG from '../../config.js'
+import * as Router from '../model/Router.js'
+import * as Sighting from '../model/Sighting.js'
+import * as Species from '../model/Species.js'
 
 // Material UI
 import { withStyles } from 'material-ui/styles'
@@ -21,10 +23,7 @@ import Grid from 'material-ui/Grid'
 import AddIcon from 'material-ui-icons/Add'
 import SortByAlphaIcon from 'material-ui-icons/SortByAlpha'
 
-import * as Sighting from './model/Sighting.js'
-import * as Species from './model/Species.js'
-
-import SpotList from './SpotList.jsx'
+import SightingList from './SightingList.jsx'
 import NewSpotDialog from './NewSpotDialog.jsx'
 import WelcomeDialog from './WelcomeDialog.jsx'
 import Stats from './Stats.jsx'
@@ -178,7 +177,7 @@ class MainLayout extends Component {
 
                     {subheader}
 
-                    <SpotList
+                    <SightingList
                         sightings={this.state.sightings}
                         isReversed={this.state.isReversed}
                     />

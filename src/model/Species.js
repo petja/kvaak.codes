@@ -1,4 +1,4 @@
-import * as CONFIG from '../Config.js'
+import * as CONFIG from '../../config.js'
 
 export function getAll() {
     return fetch(`${CONFIG.API_URL}/species`).then(resp => {

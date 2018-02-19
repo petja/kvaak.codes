@@ -1,28 +1,25 @@
 import React, {Component} from 'react'
 
-import * as Router from './Router.js'
+import * as Router from '../model/Router.js'
+import * as Sighting from '../model/Sighting.js'
 
 // Material UI
 import {withStyles} from 'material-ui/styles'
 import Typography from 'material-ui/Typography'
 
-import * as Sighting from './model/Sighting.js'
-import SpotCard from './SpotCard.jsx'
+import SightingItem from './SightingItem.jsx'
 
 const styles = theme => ({
     // Nothing here :)
 })
 
-class SpotList extends Component {
-    state = {
-    }
-
+class SightingList extends Component {
     render() {
         const {classes, sightings} = this.props
 
         const items = this._sortResults().map(spot => {
             return (
-                <SpotCard
+                <SightingItem
                     spot={spot}
                     key={spot.id}
                     onClick={e => this._openSpot(e, spot.id)}
@@ -57,4 +54,4 @@ class SpotList extends Component {
     }
 }
 
-export default withStyles(styles)(SpotList)
+export default withStyles(styles)(SightingList)

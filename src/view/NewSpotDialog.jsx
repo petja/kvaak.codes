@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
 
+// Material UI
 import { withStyles } from 'material-ui/styles'
 import Button from 'material-ui/Button'
 import TextField from 'material-ui/TextField'
@@ -16,7 +17,7 @@ import { MenuItem } from 'material-ui/Menu'
 import { FormControl, FormHelperText } from 'material-ui/Form'
 import Select from 'material-ui/Select'
 
-import * as CONFIG from './Config.js'
+import * as CONFIG from '../../config.js'
 
 const styles = theme => ({
     root: {

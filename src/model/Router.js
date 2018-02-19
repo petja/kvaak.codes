@@ -24,7 +24,6 @@ export function dispatch(url, state = {}, isReplace = false) {
         history.pushState(state, null, newUrl)
     }
 
-    document.title = newUrl
     console.log('url dispatch', {url, state, isReplace})
 
     listeners.forEach(listener => {

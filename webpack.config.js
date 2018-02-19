@@ -5,8 +5,7 @@ const webpack = require('webpack');
 
 module.exports = {
     entry       : {
-        main        : './src/main.jsx',
-        //vendor      : ['material-ui'],
+        main        : './src/view/App.jsx',
     },
     output      : {
         path        : path.join(__dirname, 'public'),
@@ -19,18 +18,6 @@ module.exports = {
             {
                 test: /\.css$/,
                 use: [ 'style-loader', 'css-loader' ]
-            },
-            {
-                test        : /\.woff2?$/,
-                use         : [
-                    {
-                        loader      : 'url-loader',
-                        options     : {
-                            name        : "./fonts/[name].[ext]",
-                            //publicPath  : '../',
-                        },
-                    },
-                ],
             },
             {
                 test: /\.jsx?$/,

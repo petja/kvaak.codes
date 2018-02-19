@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 
-const {PORT} = require('./src/Config')
+const {PORT} = require('./config')
 
 app.use(express.static('public'))
 

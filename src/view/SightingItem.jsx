@@ -1,6 +1,6 @@
 import React, {Component} from 'react'
 
-import * as Router from './Router.js'
+import * as Router from '../model/Router.js'
 import RelativeTime from './RelativeTime.jsx'
 
 // Material UI
@@ -35,7 +35,7 @@ const styles = theme => {
     }
 }
 
-class SpotCard extends Component {
+class SightingItem extends Component {
     render() {
         const {classes, spot} = this.props
         const {id, species, description, dateTime, count} = spot
@@ -68,4 +68,4 @@ class SpotCard extends Component {
     }
 }
 
-export default withStyles(styles)(SpotCard)
+export default withStyles(styles)(SightingItem)
