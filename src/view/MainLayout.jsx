@@ -60,8 +60,13 @@ const styles = theme => {
             position            : 'relative',
             //margin              : '-0.5em auto 0 auto',
             marginTop           : '-0.5em',
+            cursor              : 'pointer',
+            transition          : '0.2s',
+            '&:hover'           : {
+                opacity             : 0.8,
+            },
             '&:after'           : {
-                opacity             : 0.75,
+                opacity             : 0.8,
                 position            : 'absolute',
                 content             : '""',
                 background          : 'url("/for-vincit.png") right 50% no-repeat',
@@ -119,6 +124,7 @@ class MainLayout extends Component {
                         color='inherit'
                         className={classes.appName}
                         children={CONFIG.APP_NAME}
+                        onClick={() => Router.dispatch('/')}
                     />
                 </Toolbar>
             </AppBar>
